@@ -1,6 +1,6 @@
 # 📘 Demo Django Project With PostgreSQL
 
-This project demonstrates how to connect a Django app with a PostgreSQL database using Docker or a local setup.
+This project demonstrates how to connect a Django app with a PostgreSQL database using K8S Minikube local setup with ingress.
 
 ---
 
@@ -11,15 +11,15 @@ This project demonstrates how to connect a Django app with a PostgreSQL database
 * Docker Desktop (for PostgreSQL) or docker/docker compose setup
 * Virtual Environment support (`venv`)
 * Pip
-* K8s
+* K8s - minikube
 
 ---
 
 ## 📁 Clone the Repository
 
 ```bash
-git clone <your-repo-url>
-cd <project-folder>
+git clone https://github.com/Khushalsarode/django-postgres-webapp-k8s.git
+cd django-postgres-webapp-k8s
 ```
 
 ---
@@ -32,7 +32,7 @@ cd <project-folder>
 
 ```bash
 py -3.10 -m venv venv
-.\venv\Scripts\activate
+.\venv\Scripts\activate.bat
 ```
 
 ### Linux/Mac
@@ -126,11 +126,73 @@ Visit: [http://127.0.0.1:8000](http://127.0.0.1:8000)
 
 ---
 
+## creating docker file for containerization of django app
+[Dockerfile](./Dockerfile)
 
+## now create an docker compose file to test the application running fine
+[docker-compose.yaml](./django-postgres.yaml)
 
+## Runing the compose application
+- To start the service
+```bash
+docker-compose -f django-postgres.yaml up
+```
+- To Stop the service
+```bash
+docker-compose down
+```
 
+## Setting up an local K8s cluster using minikube
+> [!note]
+> All the instruction should be run in administrator role using powershell 
+- To install and setup follow the below guide
+[setup minikube](https://minikube.sigs.k8s.io/docs/start/?arch=%2Fwindows%2Fx86-64%2Fstable%2F.exe+download)
 
+- After installation complete check 
+```bash
+minikube
+```
+- start the minikube
+```bash
+minikube start
+```
+- This will take some time
+- As minikube is set add ingress add on in minikube
+``` bash
+minikube addons enable ingress
+```
+- All the yaml files needed for cluster are under [folder](./k8s/)
+- To apply all files
+```bash
+kubectl apply -f ./k8s/
+```
+- To check the deployments & services, Ingress
+```bash
+kubectl get all
+```
+- To check logs
+```bash
+kubectl logs <pod-id>
+```
+- To access app outside on browser
+```bash
+minikube tunnel
+```
+- To access app on browser
+```bash
+http://demo.local
+```
 
+- To map this on local system need to add into local system DNS
+- open this file in notepad administrator mode
+``` bash
+path: C:\Windows\System32\drivers\etc\hosts
+scroll at last and add:
+127.0.0.1 demo.local
+```
+
+- To automate the build and push of dockerfile, added the github action workflow which make all the process seamless and optimized.
+[workflow](.github/workflows/docker-publish.yml)
 
 
 
