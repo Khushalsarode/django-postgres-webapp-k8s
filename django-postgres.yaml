@@ -1,0 +1,47 @@
+version: '3.9'
+services:
+  web:
+    build: .
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_NAME=tododb
+      - DB_USER=user
+      - DB_PASSWORD=password
+      - DB_HOST=db
+      - DB_PORT=5432
+
+    healthcheck:
+      test: ["CMD","curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    deploy:
+      restart_policy:
+        condition: on-failure
+    depends_on:
+      - db
+    networks:
+      - django-postgres-networks
+  db:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_DB: tododb
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - django-postgres-networks
+  
+networks:
+  django-postgres-networks:
+
+volumes:
+  postgres_data:
+
